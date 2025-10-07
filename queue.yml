@@ -1,0 +1,7 @@
+config:
+  brush: "~/Downloads/brush-app-x86_64-unknown-linux-gnu"
+  processing_dir: "/tmp/splatWatch"
+queue:
+ - folder: foo
+ - folder: bar
+ - folder: baz
