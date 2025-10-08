@@ -4,6 +4,7 @@ import yaml
 import os
 from shutil import rmtree, copy
 import atexit
+import subprocess
 
 class SplatWatch():
     '''
@@ -66,8 +67,11 @@ class SplatWatch():
 
         # Settings from config
         config = data["config"]
-        self.path_to_brush_app = config["brush"]
-        self.processing_dir = config["processing_dir"]
+        self.path_to_brush_app = os.path.abspath(config["brush"])
+        self.processing_dir = os.path.abspath(config["processing_dir"])
+
+        print(self.path_to_brush_app)
+        print(self.processing_dir)
 
         # Go through each "job" and do sanity checks
         for el in data["queue"]:
@@ -132,19 +136,23 @@ class SplatWatch():
         brush_output="BRUSH_OUTPUT_PATH={}".format(output_path)
 
         # Sparse reconstruction
-        feature_extractor_cmd = "colmap feature_extractor --image_path $DATASET_PATH/images --database_path $DATASET_PATH/database.db"
+        feature_extractor_cmd = "colmap feature_extractor --image_path {}/images --database_path {}/database.db".format(job_workspace, job_workspace)
 
-        exhaustive_matcher_cmd = "colmap exhaustive_matcher --database_path $DATASET_PATH/database.db"
+        exhaustive_matcher_cmd = "colmap exhaustive_matcher --database_path {}/database.db".format(job_workspace)
 
-        mapper_cmd = "glomap mapper --database_path $DATASET_PATH/database.db --image_path $DATASET_PATH/images --output_path $DATASET_PATH/sparse"
+        mapper_cmd = "glomap mapper --database_path {}/database.db --image_path {}/images --output_path {}/sparse".format(
+            job_workspace, job_workspace, job_workspace
+        )
 
         # Gaussian Splatting with Brush
-        brush_cmd = "$BRUSH/brush_app $DATASET_PATH --export-path $BRUSH_OUTPUT_PATH"
-
+        brush_cmd = "{}/brush_app {} --export-path {}".format(
+            self.path_to_brush_app, job_workspace, output_path
+        )
+        print("BRUSH", brush_cmd)
         all_cmds = [
-                dataset_cmd, 
-                brush_app, 
-                brush_output,
+                # dataset_cmd, 
+                # brush_app, 
+                # brush_output,
                 feature_extractor_cmd, 
                 exhaustive_matcher_cmd, 
                 mapper_cmd, 
@@ -158,23 +166,20 @@ class SplatWatch():
     def run_subprocess(self, cmds):
         for cmd in cmds:
             c = cmd.split()
-            print(c)
-            
+            self.sub_p = subprocess.Popen(
+                c,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
 
-        # self.sub_p = subprocess.Popen(
-        #     cmd.split(),
-        #     stdout=subprocess.PIPE,
-        #     stderr=subprocess.PIPE,
-        #     text=True,
-        # )
+            while True:
+                line = self.sub_p.stdout.readline()
+                if not line:
+                    break
+                print(line)
 
-        # while True:
-        #     line = self.sub_p.stdout.readline()
-        #     if not line:
-        #         break
-        #     print(line)
-
-        # output, errors = self.sub_p.communicate()
+            output, errors = self.sub_p.communicate()
 
 
     def list_images(self, folder):
