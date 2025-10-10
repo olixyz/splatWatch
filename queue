@@ -1,0 +1,27 @@
+config:
+  brush: "/tmp/brush-app-x86_64-unknown-linux-gnu"
+  processing_dir: "/tmp/splatWatch"
+queue:
+ # - folder: foo
+ #   dense: True
+ #   splat: True
+ #   output: foo1
+ #   every: 4
+ #
+
+# Only sparse cloud, output name same as folder name:
+# - folder: foo
+
+# Create splats, dense cloud, use every 4th frame,
+# and write to custom output folder
+ - folder: foo
+   output: foo_every4th
+   dense: True
+   splat: True
+   every: 4
+
+ - folder: foo
+   output: foo_all
+
+
+# - folder: baz
