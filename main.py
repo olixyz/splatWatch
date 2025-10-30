@@ -113,9 +113,11 @@ class SplatWatch():
 
             if not "folder" in el:
                 # set output from image source folder
-                output = el["folder"] 
                 print("Entry has no folder, skipping")
                 continue
+
+            output = el["folder"] 
+
             if "output" in el:
                 output = el["output"]
 
@@ -173,12 +175,13 @@ class SplatWatch():
 
             # Copy images to processing folder 
             src_files = os.listdir(job_source_images)
-            name_counter = 0
+            # name_counter = 0
             for count, file_name in enumerate(src_files):
                 if (count % every) == 0:
                     full_file_name = os.path.join(job_source_images, file_name)
-                    target_file_name = os.path.join(job_processing_images_dir, str(name_counter).zfill(4) + os.path.splitext(file_name)[1])
-                    name_counter += 1
+                    target_file_name = os.path.join(job_processing_images_dir, file_name)
+                    # target_file_name = os.path.join(job_processing_images_dir, str(name_counter).zfill(4) + os.path.splitext(file_name)[1])
+                    # name_counter += 1
 
                     if os.path.isfile(full_file_name):
                         self.logger.info("Copy    " + full_file_name + "  to  " + target_file_name)
