@@ -255,7 +255,8 @@ class SplatWatch():
         for cmd in cmds:
             self.logger.info(cmd)
             c = cmd.split()
-            continue
+            print("Running command", cmd)
+            # continue
             self.sub_p = subprocess.Popen(
                 c,
                 stdout=subprocess.PIPE,
